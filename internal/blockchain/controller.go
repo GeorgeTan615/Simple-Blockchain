@@ -3,7 +3,7 @@ package blockchain
 import (
 	"net/http"
 
-	"github.com/blockchain-prac/pkg"
+	"github.com/blockchain-prac/internal/errors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,7 +15,7 @@ func AddBlockController(c *gin.Context) {
 	var req AddBlockRequest
 
 	if err := c.BindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, pkg.NewErrorResp("Bad Request"))
+		c.JSON(http.StatusBadRequest, errors.NewErrorResp("Bad Request"))
 	}
 
 	Bc.AddBlock(req.Data)
