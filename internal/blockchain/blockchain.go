@@ -1,6 +1,9 @@
 package blockchain
 
-import "reflect"
+import (
+	"log"
+	"reflect"
+)
 
 var Bc *Blockchain
 
@@ -40,8 +43,13 @@ func (bc *Blockchain) IsValidChain(chain []*Block) bool {
 	return true
 }
 
-func (bc *Blockchain) ReplaceChain(newChain []*Block) {
+func (bc *Blockchain) ReplaceChain(newChain []*Block) bool {
 	if len(newChain) > len(bc.Chain) && bc.IsValidChain(newChain) {
 		bc.Chain = newChain
+		log.Println("Chains replaced")
+		return true
+	} else {
+		log.Println("Chains not replaced")
+		return false
 	}
 }

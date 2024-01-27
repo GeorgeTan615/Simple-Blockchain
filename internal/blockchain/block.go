@@ -42,7 +42,7 @@ func MineBlock(lastBlock *Block, data []string) *Block {
 }
 
 func Hash(timestamp *time.Time, lastHash string, data []string) string {
-	hashInput := fmt.Sprintf("%s%s%s", timestamp, lastHash, data)
+	hashInput := fmt.Sprintf("%s%s%s", timestamp.Format(time.RFC3339), lastHash, data)
 	sum := sha256.Sum256([]byte(hashInput))
 	return fmt.Sprintf("%x", sum)
 }

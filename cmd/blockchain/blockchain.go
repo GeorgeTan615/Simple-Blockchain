@@ -19,29 +19,36 @@ func init() {
 		log.Fatal("Error loading .env file")
 	}
 	blockchain.Bc = blockchain.NewBlockchain()
+	blockchain.P2PServerInstance = blockchain.NewP2PServer(blockchain.Bc, []*websocket.Conn{})
 }
 
 func connectToWsPeers(peers []string) {
 	for _, peer := range peers {
-		u := url.URL{
-			Scheme: "ws",
-			Host:   peer,
-			Path:   "/",
-		}
+		go func(peer string) {
+			u := url.URL{
+				Scheme: "ws",
+				Host:   peer,
+				Path:   "/",
+			}
 
-		c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+			conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 
-		if err != nil {
-			log.Fatal("dial:", err)
-		}
-		fmt.Println("Connected to:", u.Host)
-		defer c.Close()
+			if err != nil {
+				log.Fatal("dial:", err)
+			}
+			log.Println("Connected to:", u.Host)
+			defer conn.Close()
+
+			blockchain.P2PServerInstance.Sockets = append(blockchain.P2PServerInstance.Sockets, conn)
+			blockchain.HandleBlockchainUpdates(conn, u.Host)
+		}(peer)
 	}
 }
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 	r := gin.Default()
+
 	InitRoutes(r)
 
 	port := utils.GetEnv("HTTP_PORT", "8080")

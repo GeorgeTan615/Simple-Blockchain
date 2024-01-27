@@ -19,5 +19,7 @@ func AddBlockController(c *gin.Context) {
 	}
 
 	Bc.AddBlock(req.Data)
+	P2PServerInstance.SyncChains()
+
 	c.Redirect(http.StatusFound, "/blocks")
 }
