@@ -16,7 +16,7 @@ import (
 func init() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Fatal("Error loading .env file", err)
 	}
 	blockchain.Bc = blockchain.NewBlockchain()
 	blockchain.P2PServerInstance = blockchain.NewP2PServer(blockchain.Bc, []*websocket.Conn{})
@@ -39,6 +39,7 @@ func connectToWsPeers(peers []string) {
 			log.Println("Connected to:", u.Host)
 			defer conn.Close()
 
+			// To enable bidirectional connection to all connected servers
 			blockchain.P2PServerInstance.Sockets = append(blockchain.P2PServerInstance.Sockets, conn)
 			blockchain.HandleBlockchainUpdates(conn, u.Host)
 		}(peer)

@@ -1,0 +1,54 @@
+package blockchain
+
+import (
+	"strings"
+	"time"
+)
+
+type ProofOfWorkReq struct {
+	nonce      int
+	difficulty int
+	lastHash   string
+	data       []string
+}
+
+type ProofOfWorkResp struct {
+	nonce     int
+	hash      string
+	createdAt time.Time
+}
+
+func proofOfWork(req *ProofOfWorkReq) *ProofOfWorkResp {
+	for {
+		req.nonce++
+		currTime := time.Now()
+		hash := Hash(&currTime, req.lastHash, req.data, req.nonce, req.difficulty)
+		if hash[:req.difficulty] == strings.Repeat("0", req.difficulty) {
+			return &ProofOfWorkResp{
+				nonce:     req.nonce,
+				hash:      hash,
+				createdAt: currTime,
+			}
+		}
+	}
+}
+
+func max(int1, int2 int) int {
+	if int1 <= int2 {
+		return int2
+	} else {
+		return int1
+	}
+}
+
+func adjustDifficulty(lastBlock *Block, currTime time.Time, mineRate time.Duration) int {
+	currDifficulty := lastBlock.Difficulty
+
+	if lastBlock.Timestamp.Add(mineRate).After(currTime) {
+		currDifficulty++
+	} else {
+		currDifficulty--
+	}
+
+	return max(0, currDifficulty)
+}
