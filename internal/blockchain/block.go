@@ -1,9 +1,10 @@
 package blockchain
 
 import (
-	"crypto/sha256"
 	"fmt"
 	"time"
+
+	"github.com/blockchain-prac/utils"
 )
 
 const (
@@ -60,8 +61,7 @@ func MineBlock(lastBlock *Block, data []string) *Block {
 
 func Hash(timestamp *time.Time, lastHash string, data []string, nonce, difficulty int) string {
 	hashInput := fmt.Sprintf("%s%s%s%d%d", timestamp.Format(time.RFC3339), lastHash, data, nonce, difficulty)
-	sum := sha256.Sum256([]byte(hashInput))
-	return fmt.Sprintf("%x", sum)
+	return fmt.Sprintf("%x", string(utils.Hash([]byte(hashInput))))
 }
 
 func BlockHash(block *Block) string {

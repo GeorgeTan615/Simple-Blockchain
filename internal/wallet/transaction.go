@@ -1,19 +1,30 @@
 package wallet
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/blockchain-prac/utils"
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
-type TransactionOutput struct {
-	amount  int
-	address string
+type TransactionInput struct {
+	Timestamp *time.Time
+	Amount    int
+	Address   string
+	Signature string
 }
+
+type TransactionOutput struct {
+	Amount  int
+	Address string
+}
+
 type Transaction struct {
 	Id      string
-	Inputs  []string
+	Input   *TransactionInput
 	Outputs []*TransactionOutput
 }
 
@@ -25,18 +36,66 @@ func NewTransaction(senderWallet *Wallet, recipientAddress string, amount int) (
 
 	outputs := []*TransactionOutput{
 		{
-			amount:  newBalance,
-			address: senderWallet.PublicKeyStr,
+			Amount:  newBalance,
+			Address: senderWallet.PublicKeyStr,
 		},
 		{
-			amount:  amount,
-			address: recipientAddress,
+			Amount:  amount,
+			Address: recipientAddress,
 		},
 	}
 
-	return &Transaction{
+	transaction := &Transaction{
 		Id:      utils.GenerateUniqueId(),
-		Inputs:  nil,
+		Input:   nil,
 		Outputs: outputs,
-	}, nil
+	}
+
+	err := signTransaction(senderWallet, transaction)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return transaction, nil
+}
+
+func signTransaction(senderWallet *Wallet, transaction *Transaction) error {
+	outputsBytes, err := json.Marshal(transaction.Outputs)
+
+	if err != nil {
+		return errors.New("Error converting transaction outputs to string")
+	}
+
+	sig, err := senderWallet.Sign(utils.Hash(outputsBytes))
+
+	if err != nil {
+		return errors.New("Sign transaction failed")
+	}
+
+	currTime := time.Now()
+	transaction.Input = &TransactionInput{
+		Timestamp: &currTime,
+		Amount:    senderWallet.Balance,
+		Address:   senderWallet.PublicKeyStr,
+		Signature: sig,
+	}
+
+	return nil
+}
+
+func VerifyTransaction(transaction *Transaction) bool {
+	pubKey := []byte(transaction.Input.Address)
+
+	outputsBytes, err := json.Marshal(transaction.Outputs)
+
+	if err != nil {
+		return false
+	}
+
+	digestHash := utils.Hash(outputsBytes)
+	sigWithRecoveryId := []byte(transaction.Input.Signature)
+	sigWithoutRecoveryId := sigWithRecoveryId[:len(sigWithRecoveryId)-1] // remove recovery ID
+
+	return crypto.VerifySignature(pubKey, digestHash, sigWithoutRecoveryId)
 }

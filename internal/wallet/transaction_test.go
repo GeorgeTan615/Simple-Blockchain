@@ -15,12 +15,12 @@ func TestAmountDeductedFromWalletBalance(t *testing.T) {
 	assert.Nil(t, err)
 
 	for _, output := range transaction.Outputs {
-		if output.address == wallet.PublicKeyStr {
-			assert.Equal(t, wallet.Balance-amount, output.amount)
+		if output.Address == wallet.PublicKeyStr {
+			assert.Equal(t, wallet.Balance-amount, output.Amount)
 		}
 
-		if output.address == recipientAddress {
-			assert.Equal(t, amount, output.amount)
+		if output.Address == recipientAddress {
+			assert.Equal(t, amount, output.Amount)
 		}
 	}
 }
@@ -32,4 +32,29 @@ func TestAmountExceedsWalletBalance(t *testing.T) {
 	transaction, err := NewTransaction(wallet, recipientAddress, amount)
 	assert.Nil(t, transaction)
 	assert.NotNil(t, err)
+}
+
+func TestInputHasBeenCreatedInTransaction(t *testing.T) {
+	wallet := NewWallet()
+	recipientAddress := "recipient"
+	transaction, err := NewTransaction(wallet, recipientAddress, 0)
+	assert.Nil(t, err)
+	assert.Equal(t, wallet.Balance, transaction.Input.Amount)
+}
+
+func TestVerifyTransaction(t *testing.T) {
+	// Happy Path
+	wallet := NewWallet()
+	recipientAddress := "recipient"
+	transaction, err := NewTransaction(wallet, recipientAddress, 0)
+	assert.Nil(t, err)
+	assert.True(t, VerifyTransaction(transaction))
+
+	// Transaction sender public key gets tampered
+	transaction.Input.Address = "random"
+	assert.False(t, VerifyTransaction(transaction))
+
+	// Someone tampers with data
+	transaction.Outputs[0].Amount = 100000
+	assert.False(t, VerifyTransaction(transaction))
 }

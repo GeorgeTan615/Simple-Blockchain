@@ -34,3 +34,11 @@ func (w *Wallet) String() string {
 		w.PublicKeyStr,
 	)
 }
+
+func (w *Wallet) Sign(data []byte) (string, error) {
+	sig, err := crypto.Sign(data, w.PrivateKey)
+	if err != nil {
+		return "", err
+	}
+	return string(sig), nil
+}

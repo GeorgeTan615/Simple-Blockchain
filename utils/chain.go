@@ -2,6 +2,7 @@ package utils
 
 import (
 	"crypto/ecdsa"
+	"crypto/sha256"
 	"log"
 
 	"github.com/ethereum/go-ethereum/crypto"
@@ -18,4 +19,9 @@ func GeneratePrivateKey() *ecdsa.PrivateKey {
 
 func GenerateUniqueId() string {
 	return uuid.New().String()
+}
+
+func Hash(hashInput []byte) []byte {
+	hash := sha256.Sum256(hashInput)
+	return hash[:]
 }
