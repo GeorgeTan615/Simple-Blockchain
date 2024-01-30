@@ -70,12 +70,13 @@ func TestUpdateTransaction(t *testing.T) {
 	secondTransactionAmount := 20
 	err = transaction.Update(wallet, "newRecipient", secondTransactionAmount)
 
+	senderOutput := transaction.Outputs[0]
 	assert.Nil(t, err)
 	assert.Equal(t, 3, len(transaction.Outputs))
 	assert.Equal(
 		t,
 		wallet.Balance-firstTransactionAmount-secondTransactionAmount,
-		transaction.Outputs[0].Amount)
+		senderOutput.Amount)
 	assert.True(t, VerifyTransaction(transaction))
 
 }
