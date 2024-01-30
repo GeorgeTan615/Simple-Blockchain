@@ -60,6 +60,30 @@ func NewTransaction(senderWallet *Wallet, recipientAddress string, amount int) (
 	return transaction, nil
 }
 
+func (t *Transaction) Update(senderWallet *Wallet, recipient string, amount int) error {
+	// Loop through outputs to see if amount exceeds sender balance, if not, update accordingly
+	for _, output := range t.Outputs {
+		if output.Address == senderWallet.PublicKeyStr {
+			if amount > output.Amount {
+				return errors.New(fmt.Sprintf("Amount %d exceeds wallet balance", amount))
+			} else {
+				output.Amount -= amount
+				break
+			}
+		}
+	}
+
+	// Add into outputs
+	t.Outputs = append(t.Outputs, &TransactionOutput{
+		Amount:  amount,
+		Address: recipient,
+	})
+
+	// Re-sign
+	err := signTransaction(senderWallet, t)
+	return err
+}
+
 func signTransaction(senderWallet *Wallet, transaction *Transaction) error {
 	outputsBytes, err := json.Marshal(transaction.Outputs)
 

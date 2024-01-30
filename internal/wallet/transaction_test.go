@@ -58,3 +58,24 @@ func TestVerifyTransaction(t *testing.T) {
 	transaction.Outputs[0].Amount = 100000
 	assert.False(t, VerifyTransaction(transaction))
 }
+
+func TestUpdateTransaction(t *testing.T) {
+	// Happy Path
+	wallet := NewWallet()
+	recipientAddress := "recipient"
+	firstTransactionAmount := 10
+	transaction, err := NewTransaction(wallet, recipientAddress, firstTransactionAmount)
+	assert.Nil(t, err)
+
+	secondTransactionAmount := 20
+	err = transaction.Update(wallet, "newRecipient", secondTransactionAmount)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(transaction.Outputs))
+	assert.Equal(
+		t,
+		wallet.Balance-firstTransactionAmount-secondTransactionAmount,
+		transaction.Outputs[0].Amount)
+	assert.True(t, VerifyTransaction(transaction))
+
+}
