@@ -3,86 +3,86 @@ package wallet
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestAmountDeductedFromWalletBalance(t *testing.T) {
+type TransactionTestSuite struct {
+	suite.Suite
+	wallet           *Wallet
+	amount           int
+	recipientAddress string
+	transaction      *Transaction
+}
+
+func (s *TransactionTestSuite) SetupTest() {
 	wallet := NewWallet()
 	amount := 50
 	recipientAddress := "recipient"
-	transaction, err := NewTransaction(wallet, recipientAddress, amount)
+	transaction, _ := NewTransaction(wallet, recipientAddress, amount)
 
-	assert.Nil(t, err)
+	s.wallet = wallet
+	s.amount = amount
+	s.recipientAddress = recipientAddress
+	s.transaction = transaction
+}
 
-	for _, output := range transaction.Outputs {
-		if output.Address == wallet.PublicKeyStr {
-			assert.Equal(t, wallet.Balance-amount, output.Amount)
+func (s *TransactionTestSuite) TestAmountDeductedFromWalletBalance() {
+	for _, output := range s.transaction.Outputs {
+		if output.Address == s.wallet.PublicKeyStr {
+			s.Equal(s.wallet.Balance-s.amount, output.Amount)
 		}
 
-		if output.Address == recipientAddress {
-			assert.Equal(t, amount, output.Amount)
+		if output.Address == s.recipientAddress {
+			s.Equal(s.amount, output.Amount)
 		}
 	}
 }
 
-func TestAmountExceedsWalletBalance(t *testing.T) {
-	wallet := NewWallet()
-	amount := 500000
-	recipientAddress := "recipient"
-	transaction, err := NewTransaction(wallet, recipientAddress, amount)
-	assert.Nil(t, transaction)
-	assert.NotNil(t, err)
+func (s *TransactionTestSuite) TestAmountExceedsWalletBalance() {
+	transaction, err := NewTransaction(s.wallet, s.recipientAddress, s.wallet.Balance+10000)
+	s.Nil(transaction)
+	s.NotNil(err)
 }
 
-func TestInputHasBeenCreatedInTransaction(t *testing.T) {
-	wallet := NewWallet()
-	recipientAddress := "recipient"
-	transaction, err := NewTransaction(wallet, recipientAddress, 0)
-	assert.Nil(t, err)
-	assert.Equal(t, wallet.Balance, transaction.Input.Amount)
+func (s *TransactionTestSuite) TestInputHasBeenCreatedInTransaction() {
+	s.Equal(s.wallet.Balance, s.transaction.Input.Amount)
 }
 
-func TestVerifyTransaction(t *testing.T) {
-	// Happy Path
-	wallet := NewWallet()
-	recipientAddress := "recipient"
-	transaction, err := NewTransaction(wallet, recipientAddress, 0)
-	assert.Nil(t, err)
-	assert.True(t, VerifyTransaction(transaction))
-
-	// Transaction sender public key gets tampered
-	transaction.Input.Address = "random"
-	assert.False(t, VerifyTransaction(transaction))
-
-	// Someone tampers with data
-	transaction.Outputs[0].Amount = 100000
-	assert.False(t, VerifyTransaction(transaction))
+func (s *TransactionTestSuite) TestVerifyTransactionSuccess() {
+	s.True(VerifyTransaction(s.transaction))
 }
 
-func TestUpdateTransaction(t *testing.T) {
-	// Happy Path
-	wallet := NewWallet()
-	recipientAddress := "recipient"
-	firstTransactionAmount := 10
-	transaction, err := NewTransaction(wallet, recipientAddress, firstTransactionAmount)
-	assert.Nil(t, err)
+func (s *TransactionTestSuite) TestVerifyTransactionFailed_WhenSenderPublicKeyTampered() {
+	s.transaction.Input.Address = "random"
+	s.False(VerifyTransaction(s.transaction))
+}
 
-	secondTransactionAmount := 20
-	err = transaction.Update(wallet, "newRecipient", secondTransactionAmount)
+func (s *TransactionTestSuite) TestVerifyTransactionFailed_WhenTransactionDataTampered() {
+	s.transaction.Outputs[0].Amount = 100000
+	s.False(VerifyTransaction(s.transaction))
+}
+
+func (s *TransactionTestSuite) TestUpdateTransaction() {
+	initialTransactionAmount := s.amount
+	newTransactionAmount := 20
+	err := s.transaction.Update(s.wallet, "newRecipient", newTransactionAmount)
+
+	s.Nil(err)
 
 	var senderAmount int
-	for _, output := range transaction.Outputs {
-		if output.Address == wallet.PublicKeyStr {
+	for _, output := range s.transaction.Outputs {
+		if output.Address == s.wallet.PublicKeyStr {
 			senderAmount = output.Amount
 		}
 	}
 
-	assert.Nil(t, err)
-	assert.Equal(t, 3, len(transaction.Outputs))
-	assert.Equal(
-		t,
-		wallet.Balance-firstTransactionAmount-secondTransactionAmount,
+	s.Equal(3, len(s.transaction.Outputs))
+	s.Equal(
+		s.wallet.Balance-initialTransactionAmount-newTransactionAmount,
 		senderAmount)
-	assert.True(t, VerifyTransaction(transaction))
+	s.True(VerifyTransaction(s.transaction))
+}
 
+func TestTransactionTestSuite(t *testing.T) {
+	suite.Run(t, new(TransactionTestSuite))
 }

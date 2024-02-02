@@ -41,7 +41,7 @@ func TestBlockchainInvalidatesCorruptedChain(t *testing.T) {
 	assert.False(t, bc.IsValidChain(bc2.Chain))
 }
 
-func TestBlockchanReplaceValidChain(t *testing.T) {
+func TestBlockchainReplaceValidChain(t *testing.T) {
 	bc := NewBlockchain()
 	bc2 := NewBlockchain()
 	bc2.AddBlock([]string{"123", "456"})
@@ -49,7 +49,7 @@ func TestBlockchanReplaceValidChain(t *testing.T) {
 	assert.Equal(t, bc2.Chain, bc.Chain)
 }
 
-func TestBlockchanCantReplaceShorterChain(t *testing.T) {
+func TestBlockchainCantReplaceShorterChain(t *testing.T) {
 	bc := NewBlockchain()
 	bc.AddBlock([]string{"123", "456"})
 	bc2 := NewBlockchain()
@@ -57,7 +57,7 @@ func TestBlockchanCantReplaceShorterChain(t *testing.T) {
 	assert.NotEqual(t, bc2.Chain, bc.Chain)
 }
 
-func TestBlockchanCantReplaceInvalidChain(t *testing.T) {
+func TestBlockchainCantReplaceInvalidChain(t *testing.T) {
 	bc := NewBlockchain()
 	bc2 := NewBlockchain()
 	bc2.AddBlock([]string{"123", "456"})

@@ -30,3 +30,13 @@ func findTransactionIdxById(transactions []*Transaction, id string) int {
 
 	return -1
 }
+
+func (tp *TransactionPool) FindExistingTransactionByPubKey(senderAddress string) *Transaction {
+	for _, transaction := range tp.Transactions {
+		if transaction.Input.Address == senderAddress {
+			return transaction
+		}
+	}
+
+	return nil
+}

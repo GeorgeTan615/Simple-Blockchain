@@ -2,6 +2,7 @@ package wallet
 
 import (
 	"crypto/ecdsa"
+	"errors"
 	"fmt"
 
 	"github.com/blockchain-prac/utils"
@@ -41,4 +42,26 @@ func (w *Wallet) Sign(data []byte) (string, error) {
 		return "", err
 	}
 	return string(sig), nil
+}
+
+func (w *Wallet) CreateTransaction(recipient string, amount int, transactionPool *TransactionPool) (*Transaction, error) {
+	if amount > w.Balance {
+		return nil, errors.New("Amount exceeded balance")
+	}
+
+	existingTransaction := transactionPool.FindExistingTransactionByPubKey(w.PublicKeyStr)
+
+	if existingTransaction != nil {
+		existingTransaction.Update(w, recipient, amount)
+		return existingTransaction, nil
+	}
+
+	newTransaction, err := NewTransaction(w, recipient, amount)
+
+	if err != nil {
+		return nil, errors.New("Error creating new transaction")
+	}
+
+	transactionPool.UpsertTransaction(newTransaction)
+	return newTransaction, nil
 }
