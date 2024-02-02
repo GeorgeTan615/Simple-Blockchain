@@ -2,6 +2,7 @@ package blockchain
 
 import (
 	"crypto/ecdsa"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"time"
@@ -24,7 +25,7 @@ func NewWallet() *Wallet {
 	return &Wallet{
 		Balance:      config.INITIAL_BALANCE,
 		PrivateKey:   privateKey,
-		PublicKeyStr: string(crypto.FromECDSAPub(&privateKey.PublicKey)),
+		PublicKeyStr: hex.EncodeToString(crypto.FromECDSAPub(&privateKey.PublicKey)),
 	}
 }
 
@@ -48,7 +49,7 @@ func (w *Wallet) Sign(data []byte) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return string(sig), nil
+	return hex.EncodeToString(sig), nil
 }
 
 func (w *Wallet) CreateTransaction(recipient string, amount int, blockchain *Blockchain, transactionPool *TransactionPool) (*Transaction, error) {

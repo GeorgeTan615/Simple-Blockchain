@@ -1,6 +1,7 @@
 package blockchain
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -112,7 +113,11 @@ func signTransaction(senderWallet *Wallet, transaction *Transaction) error {
 }
 
 func VerifyTransaction(transaction *Transaction) bool {
-	pubKey := []byte(transaction.Input.Address)
+	pubKey, err := hex.DecodeString(transaction.Input.Address)
+
+	if err != nil {
+		return false
+	}
 
 	outputsBytes, err := json.Marshal(transaction.Outputs)
 
@@ -121,7 +126,12 @@ func VerifyTransaction(transaction *Transaction) bool {
 	}
 
 	digestHash := utils.Hash(outputsBytes)
-	sigWithRecoveryId := []byte(transaction.Input.Signature)
+	sigWithRecoveryId, err := hex.DecodeString(transaction.Input.Signature)
+
+	if err != nil {
+		return false
+	}
+
 	sigWithoutRecoveryId := sigWithRecoveryId[:len(sigWithRecoveryId)-1] // remove recovery ID
 
 	return crypto.VerifySignature(pubKey, digestHash, sigWithoutRecoveryId)

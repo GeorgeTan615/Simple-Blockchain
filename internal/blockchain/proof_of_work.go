@@ -1,6 +1,7 @@
 package blockchain
 
 import (
+	"encoding/json"
 	"strings"
 	"time"
 )
@@ -19,10 +20,16 @@ type ProofOfWorkResp struct {
 }
 
 func proofOfWork(req *ProofOfWorkReq) *ProofOfWorkResp {
+	dataBytes, err := json.Marshal(req.data)
+
+	if err != nil {
+		return nil
+	}
+
 	for {
 		req.nonce++
 		currTime := time.Now()
-		hash := Hash(&currTime, req.lastHash, req.data, req.nonce, req.difficulty)
+		hash := Hash(&currTime, req.lastHash, dataBytes, req.nonce, req.difficulty)
 		if hash[:req.difficulty] == strings.Repeat("0", req.difficulty) {
 			return &ProofOfWorkResp{
 				nonce:     req.nonce,

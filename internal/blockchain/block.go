@@ -1,6 +1,8 @@
 package blockchain
 
 import (
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -55,12 +57,15 @@ func MineBlock(lastBlock *Block, data []*Transaction) *Block {
 	return NewBlock(&resp.createdAt, lastBlock.Hash, resp.hash, data, resp.nonce, difficulty)
 }
 
-func Hash(timestamp *time.Time, lastHash string, data []*Transaction, nonce, difficulty int) string {
-	hashInput := fmt.Sprintf("%s%s%v%d%d", timestamp.Format(time.RFC3339), lastHash, data, nonce, difficulty)
+func Hash(timestamp *time.Time, lastHash string, data []byte, nonce, difficulty int) string {
+	hashInput := fmt.Sprintf("%s%s%s%d%d", timestamp.Format(time.RFC3339), lastHash, hex.EncodeToString(data), nonce, difficulty)
 	return fmt.Sprintf("%x", string(utils.Hash([]byte(hashInput))))
 }
 
 func BlockHash(block *Block) string {
-	timestamp, lastHash, data, nonce := block.Timestamp, block.LastHash, block.Data, block.Nonce
-	return Hash(timestamp, lastHash, data, nonce, block.Difficulty)
+	dataBytes, err := json.Marshal(block.Data)
+	if err != nil {
+		return ""
+	}
+	return Hash(block.Timestamp, block.LastHash, dataBytes, block.Nonce, block.Difficulty)
 }

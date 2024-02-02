@@ -10,10 +10,10 @@
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceRoot}/cmd/blockchain",
-            // "env": {
-            //     "HTTP_PORT": "9091",
-            //     "PEERS": "localhost:9090"
-            // }
+            "env": {
+                "HTTP_PORT": "9091",
+                "PEERS": "localhost:9090"
+            }
         }
     ]
 }
