@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/blockchain-prac/config"
 	"github.com/blockchain-prac/utils"
 	"github.com/ethereum/go-ethereum/crypto"
 )
@@ -28,6 +29,20 @@ type Transaction struct {
 	Outputs []*TransactionOutput `json:"outputs"`
 }
 
+func NewTransactionWithOutputs(senderWallet *Wallet, outputs []*TransactionOutput) (*Transaction, error) {
+	transaction := &Transaction{
+		Id:      utils.GenerateUniqueId(),
+		Outputs: outputs,
+	}
+	err := signTransaction(senderWallet, transaction)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return transaction, nil
+}
+
 func NewTransaction(senderWallet *Wallet, recipientAddress string, amount int) (*Transaction, error) {
 	newBalance := senderWallet.Balance - amount
 	if newBalance < 0 {
@@ -45,19 +60,7 @@ func NewTransaction(senderWallet *Wallet, recipientAddress string, amount int) (
 		},
 	}
 
-	transaction := &Transaction{
-		Id:      utils.GenerateUniqueId(),
-		Input:   nil,
-		Outputs: outputs,
-	}
-
-	err := signTransaction(senderWallet, transaction)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return transaction, nil
+	return NewTransactionWithOutputs(senderWallet, outputs)
 }
 
 func (t *Transaction) Update(senderWallet *Wallet, recipient string, amount int) error {
@@ -122,4 +125,14 @@ func VerifyTransaction(transaction *Transaction) bool {
 	sigWithoutRecoveryId := sigWithRecoveryId[:len(sigWithRecoveryId)-1] // remove recovery ID
 
 	return crypto.VerifySignature(pubKey, digestHash, sigWithoutRecoveryId)
+}
+
+func RewardTransaction(minerWallet *Wallet, blockchainWallet *Wallet) (*Transaction, error) {
+	outputs := []*TransactionOutput{
+		{
+			Amount:  config.MINING_REWARD,
+			Address: minerWallet.PublicKeyStr,
+		},
+	}
+	return NewTransactionWithOutputs(blockchainWallet, outputs)
 }

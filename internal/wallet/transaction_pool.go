@@ -1,5 +1,9 @@
 package wallet
 
+import (
+	"github.com/blockchain-prac/utils"
+)
+
 var Tp *TransactionPool
 
 type TransactionPool struct {
@@ -41,4 +45,26 @@ func (tp *TransactionPool) FindExistingTransactionByPubKey(senderAddress string)
 	}
 
 	return nil
+}
+
+func (tp *TransactionPool) GetValidTransactions() []*Transaction {
+	return utils.Filter[Transaction](tp.Transactions, isValidTransaction)
+}
+
+func isValidTransaction(transaction *Transaction) bool {
+	// Verify if total amount tallies
+	totalAmount := 0
+	for _, output := range transaction.Outputs {
+		totalAmount += output.Amount
+	}
+	if totalAmount != transaction.Input.Amount {
+		return false
+	}
+
+	// Verify transaction signature
+	return VerifyTransaction(transaction)
+}
+
+func (tp *TransactionPool) Clear() {
+	tp.Transactions = nil
 }

@@ -1,6 +1,7 @@
 package wallet
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -17,8 +18,7 @@ func (s *TransactionPoolTestSuite) SetupTest() {
 	tp := NewTransactionPool()
 	wallet := NewWallet()
 	amount := 100
-	transaction, _ := NewTransaction(wallet, "recipient", amount)
-	tp.UpsertTransaction(transaction)
+	transaction, _ := wallet.CreateTransaction("recipient", amount, tp)
 
 	s.t = transaction
 	s.tp = tp
@@ -44,6 +44,26 @@ func (s *TransactionPoolTestSuite) TestTransactionUpdated() {
 			s.NotEqual(oldTransaction, *t)
 		}
 	}
+}
+
+func (s *TransactionPoolTestSuite) TestGetValidTransactionsWithNonCorruptedTransactions() {
+	expectedValidTransactions := s.tp.Transactions
+	for i := 0; i < 6; i++ {
+		newWallet := NewWallet()
+		transaction, err := newWallet.CreateTransaction("recipient2", 100, s.tp)
+
+		s.Nil(err)
+		if i%2 == 0 {
+			transaction.Outputs[0].Amount = 999999
+		} else {
+			expectedValidTransactions = append(expectedValidTransactions, transaction)
+		}
+	}
+
+	currentValidTransactions := s.tp.GetValidTransactions()
+
+	s.NotEqual(len(s.tp.Transactions), len(currentValidTransactions))
+	s.True(reflect.DeepEqual(expectedValidTransactions, currentValidTransactions))
 }
 
 func TestTransactionPoolTestSuite(t *testing.T) {

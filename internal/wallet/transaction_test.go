@@ -3,6 +3,7 @@ package wallet
 import (
 	"testing"
 
+	"github.com/blockchain-prac/config"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -81,6 +82,18 @@ func (s *TransactionTestSuite) TestUpdateTransaction() {
 		s.wallet.Balance-initialTransactionAmount-newTransactionAmount,
 		senderAmount)
 	s.True(VerifyTransaction(s.transaction))
+}
+
+func (s *TransactionTestSuite) TestRewardTransaction() {
+	bcWallet := NewBlockchainWallet()
+	transaction, err := RewardTransaction(s.wallet, bcWallet)
+	s.Nil(err)
+
+	for _, output := range transaction.Outputs {
+		if output.Address == s.wallet.PublicKeyStr {
+			s.Equal(config.MINING_REWARD, output.Amount)
+		}
+	}
 }
 
 func TestTransactionTestSuite(t *testing.T) {

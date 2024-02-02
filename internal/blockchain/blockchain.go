@@ -3,8 +3,11 @@ package blockchain
 import (
 	"log"
 	"reflect"
+
+	"github.com/blockchain-prac/internal/wallet"
 )
 
+// TODO improve test cases, esp with transaction data now
 var Bc *Blockchain
 
 type Blockchain struct {
@@ -19,7 +22,7 @@ func NewBlockchain() *Blockchain {
 	}
 }
 
-func (bc *Blockchain) AddBlock(data []string) *Block {
+func (bc *Blockchain) AddBlock(data []*wallet.Transaction) *Block {
 	lastBlock := bc.Chain[len(bc.Chain)-1]
 	newBlock := MineBlock(lastBlock, data)
 	bc.Chain = append(bc.Chain, newBlock)

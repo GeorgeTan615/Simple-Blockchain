@@ -5,15 +5,12 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/blockchain-prac/config"
 	"github.com/blockchain-prac/utils"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
 var W *Wallet
-
-const (
-	InitialBalance = 500
-)
 
 type Wallet struct {
 	Balance      int
@@ -24,10 +21,17 @@ type Wallet struct {
 func NewWallet() *Wallet {
 	privateKey := utils.GeneratePrivateKey()
 	return &Wallet{
-		Balance:      InitialBalance,
+		Balance:      config.INITIAL_BALANCE,
 		PrivateKey:   privateKey,
 		PublicKeyStr: string(crypto.FromECDSAPub(&privateKey.PublicKey)),
 	}
+}
+
+func NewBlockchainWallet() *Wallet {
+	wallet := NewWallet()
+	wallet.Balance = 1000000000
+	wallet.PublicKeyStr = "blockchain-wallet"
+	return wallet
 }
 
 func (w *Wallet) String() string {

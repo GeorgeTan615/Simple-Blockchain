@@ -3,6 +3,7 @@ package wallet
 import (
 	"testing"
 
+	"github.com/blockchain-prac/utils"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -46,22 +47,12 @@ func (s *WalletTestSuite) TestTwoSameRecipientOutputAfterTwoSameTransactions() {
 	s.Nil(err)
 
 	// Should have two similar recipient transaction outputs
-	recipientOutputs := filter[TransactionOutput](s.tp.Transactions[0].Outputs, func(to *TransactionOutput) bool {
+	recipientOutputs := utils.Filter[TransactionOutput](s.tp.Transactions[0].Outputs, func(to *TransactionOutput) bool {
 		return to.Address == recipient
 	})
 
 	s.Equal(2, len(recipientOutputs))
 	s.Equal(*recipientOutputs[0], *recipientOutputs[1])
-}
-
-func filter[T any](slice []*T, f func(*T) bool) []*T {
-	var output []*T
-	for _, e := range slice {
-		if f(e) {
-			output = append(output, e)
-		}
-	}
-	return output
 }
 
 func TestWalletTestSuite(t *testing.T) {

@@ -4,24 +4,21 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/blockchain-prac/config"
+	"github.com/blockchain-prac/internal/wallet"
 	"github.com/blockchain-prac/utils"
 )
 
-const (
-	Difficulty = 4
-	MineRate   = 1 * time.Second
-)
-
 type Block struct {
-	Timestamp  *time.Time `json:"timestamp"`
-	LastHash   string     `json:"lastHash"`
-	Hash       string     `json:"hash"`
-	Data       []string   `json:"data"`
-	Nonce      int        `json:"nonce"`
-	Difficulty int        `json:"difficulty"`
+	Timestamp  *time.Time            `json:"timestamp"`
+	LastHash   string                `json:"lastHash"`
+	Hash       string                `json:"hash"`
+	Data       []*wallet.Transaction `json:"data"`
+	Nonce      int                   `json:"nonce"`
+	Difficulty int                   `json:"difficulty"`
 }
 
-func NewBlock(timestamp *time.Time, lastHash, hash string, data []string, nonce, difficulty int) *Block {
+func NewBlock(timestamp *time.Time, lastHash, hash string, data []*wallet.Transaction, nonce, difficulty int) *Block {
 	return &Block{
 		Timestamp:  timestamp,
 		LastHash:   lastHash,
@@ -33,7 +30,7 @@ func NewBlock(timestamp *time.Time, lastHash, hash string, data []string, nonce,
 }
 
 func (b *Block) String() string {
-	return fmt.Sprintf("Block -\nTimestamp: %s\nLast Hash: %s\nHash: %s\nData: %s\n Nonce: %d\n Difficulty: %d",
+	return fmt.Sprintf("Block -\nTimestamp: %s\nLast Hash: %s\nHash: %s\nData: %v\n Nonce: %d\n Difficulty: %d",
 		b.Timestamp,
 		b.LastHash,
 		b.Hash,
@@ -44,11 +41,11 @@ func (b *Block) String() string {
 
 func NewGenesisBlock() *Block {
 	currTime := time.Date(2023, time.December, 3, 0, 0, 0, 0, time.UTC)
-	return NewBlock(&currTime, "", "f1r57-h45h", []string{}, 0, Difficulty)
+	return NewBlock(&currTime, "", "f1r57-h45h", []*wallet.Transaction{}, 0, config.DIFFICULTY)
 }
 
-func MineBlock(lastBlock *Block, data []string) *Block {
-	difficulty := adjustDifficulty(lastBlock, time.Now(), MineRate)
+func MineBlock(lastBlock *Block, data []*wallet.Transaction) *Block {
+	difficulty := adjustDifficulty(lastBlock, time.Now(), config.MINE_RATE)
 	resp := proofOfWork(&ProofOfWorkReq{
 		nonce:      0,
 		difficulty: difficulty,
@@ -59,8 +56,8 @@ func MineBlock(lastBlock *Block, data []string) *Block {
 	return NewBlock(&resp.createdAt, lastBlock.Hash, resp.hash, data, resp.nonce, difficulty)
 }
 
-func Hash(timestamp *time.Time, lastHash string, data []string, nonce, difficulty int) string {
-	hashInput := fmt.Sprintf("%s%s%s%d%d", timestamp.Format(time.RFC3339), lastHash, data, nonce, difficulty)
+func Hash(timestamp *time.Time, lastHash string, data []*wallet.Transaction, nonce, difficulty int) string {
+	hashInput := fmt.Sprintf("%s%s%v%d%d", timestamp.Format(time.RFC3339), lastHash, data, nonce, difficulty)
 	return fmt.Sprintf("%x", string(utils.Hash([]byte(hashInput))))
 }
 
