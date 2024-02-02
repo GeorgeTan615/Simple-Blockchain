@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/blockchain-prac/internal/blockchain"
+	"github.com/blockchain-prac/internal/wallet"
 	"github.com/blockchain-prac/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -19,7 +20,9 @@ func init() {
 		log.Fatal("Error loading .env file", err)
 	}
 	blockchain.Bc = blockchain.NewBlockchain()
-	blockchain.P2PServerInstance = blockchain.NewP2PServer(blockchain.Bc, []*websocket.Conn{})
+	wallet.Tp = wallet.NewTransactionPool()
+	wallet.W = wallet.NewWallet()
+	blockchain.P2PServerInstance = blockchain.NewP2PServer(blockchain.Bc, wallet.Tp, []*websocket.Conn{})
 }
 
 func connectToWsPeers(peers []string) {

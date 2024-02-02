@@ -8,5 +8,11 @@ import (
 func InitRoutes(r *gin.Engine) {
 	r.GET("/blocks", blockchain.GetBlocksController)
 	r.POST("/blocks", blockchain.AddBlockController)
+
 	r.GET("/", blockchain.P2PServerInstance.Listen)
+
+	r.GET("/transactions", blockchain.GetTransactionsController)
+	r.POST("/transactions", blockchain.CreateTransactionController)
+
+	r.GET("/public-key", blockchain.GetPublicKeyController)
 }

@@ -9,6 +9,8 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
+var W *Wallet
+
 const (
 	InitialBalance = 500
 )

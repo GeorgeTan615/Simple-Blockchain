@@ -1,5 +1,7 @@
 package wallet
 
+var Tp *TransactionPool
+
 type TransactionPool struct {
 	Transactions []*Transaction
 }

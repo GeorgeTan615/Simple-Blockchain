@@ -13,12 +13,12 @@ const (
 )
 
 type Block struct {
-	Timestamp  *time.Time
-	LastHash   string
-	Hash       string
-	Data       []string
-	Nonce      int
-	Difficulty int
+	Timestamp  *time.Time `json:"timestamp"`
+	LastHash   string     `json:"lastHash"`
+	Hash       string     `json:"hash"`
+	Data       []string   `json:"data"`
+	Nonce      int        `json:"nonce"`
+	Difficulty int        `json:"difficulty"`
 }
 
 func NewBlock(timestamp *time.Time, lastHash, hash string, data []string, nonce, difficulty int) *Block {

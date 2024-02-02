@@ -11,21 +11,21 @@ import (
 )
 
 type TransactionInput struct {
-	Timestamp *time.Time
-	Amount    int
-	Address   string
-	Signature string
+	Timestamp *time.Time `json:"timestamp"`
+	Amount    int        `json:"amount"`
+	Address   string     `json:"address"`
+	Signature string     `json:"signature"`
 }
 
 type TransactionOutput struct {
-	Amount  int
-	Address string
+	Amount  int    `json:"amount"`
+	Address string `json:"address"`
 }
 
 type Transaction struct {
-	Id      string
-	Input   *TransactionInput
-	Outputs []*TransactionOutput
+	Id      string               `json:"id"`
+	Input   *TransactionInput    `json:"input"`
+	Outputs []*TransactionOutput `json:"outputs"`
 }
 
 func NewTransaction(senderWallet *Wallet, recipientAddress string, amount int) (*Transaction, error) {
