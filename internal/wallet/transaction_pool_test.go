@@ -66,6 +66,11 @@ func (s *TransactionPoolTestSuite) TestGetValidTransactionsWithNonCorruptedTrans
 	s.True(reflect.DeepEqual(expectedValidTransactions, currentValidTransactions))
 }
 
+func (s *TransactionPoolTestSuite) TestClear() {
+	s.tp.Clear()
+	s.Equal(0, len(s.tp.Transactions))
+}
+
 func TestTransactionPoolTestSuite(t *testing.T) {
 	suite.Run(t, new(TransactionPoolTestSuite))
 }

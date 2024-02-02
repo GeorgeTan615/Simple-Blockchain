@@ -7,7 +7,6 @@ import (
 	"github.com/blockchain-prac/internal/wallet"
 )
 
-// TODO improve test cases, esp with transaction data now
 var Bc *Blockchain
 
 type Blockchain struct {

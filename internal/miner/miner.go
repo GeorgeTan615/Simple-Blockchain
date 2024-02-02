@@ -35,8 +35,9 @@ func (m *Miner) Mine() error {
 	}
 
 	validTransactions = append(validTransactions, rewardTransaction)
-	block := m.Blockchain.AddBlock(validTransactions)
+	m.Blockchain.AddBlock(validTransactions)
 	m.P2PServer.SyncChains()
+	m.TransactionPool.Clear()
 
 	// Include reward for miner
 	// Create a block consisting of valid transactions
