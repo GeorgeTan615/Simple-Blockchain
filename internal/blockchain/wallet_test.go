@@ -48,13 +48,37 @@ func (s *WalletTestSuite) TestTwoSameRecipientOutputAfterTwoSameTransactions() {
 	_, err = s.w.CreateTransaction(recipient, amount, s.bc, s.tp)
 	s.Nil(err)
 
-	// Should have two similar recipient transaction outputs
 	recipientOutputs := utils.Filter[TransactionOutput](s.tp.Transactions[0].Outputs, func(to *TransactionOutput) bool {
 		return to.Address == recipient
 	})
 
 	s.Equal(2, len(recipientOutputs))
 	s.Equal(*recipientOutputs[0], *recipientOutputs[1])
+}
+
+func (s *WalletTestSuite) TestWalletCalculateBalance() {
+	currWalletInitialBalance := s.w.Balance
+
+	anotherWallet := NewWallet()
+	anotherWalletInitialBalance := anotherWallet.Balance
+	amount1 := 50
+
+	_, err := anotherWallet.CreateTransaction(s.w.PublicKeyStr, amount1, s.bc, s.tp)
+	s.Nil(err)
+
+	s.bc.AddBlock(s.tp.Transactions)
+	s.Equal(anotherWallet.Balance-amount1, anotherWallet.CalculateWalletBalance(s.bc))
+	s.Equal(s.w.Balance+amount1, s.w.CalculateWalletBalance(s.bc))
+
+	s.tp.Clear()
+
+	amount2 := 100
+	_, err = s.w.CreateTransaction(anotherWallet.PublicKeyStr, amount2, s.bc, s.tp)
+	s.Nil(err)
+
+	s.bc.AddBlock(s.tp.Transactions)
+	s.Equal(anotherWalletInitialBalance-amount1+amount2, anotherWallet.CalculateWalletBalance(s.bc))
+	s.Equal(currWalletInitialBalance+amount1-amount2, s.w.CalculateWalletBalance(s.bc))
 }
 
 func TestWalletTestSuite(t *testing.T) {
