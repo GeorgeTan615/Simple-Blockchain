@@ -1,4 +1,4 @@
-package wallet
+package blockchain
 
 import (
 	"testing"
@@ -9,11 +9,13 @@ import (
 
 type WalletTestSuite struct {
 	suite.Suite
+	bc *Blockchain
 	w  *Wallet
 	tp *TransactionPool
 }
 
 func (s *WalletTestSuite) SetupTest() {
+	s.bc = NewBlockchain()
 	s.w = NewWallet()
 	s.tp = NewTransactionPool()
 }
@@ -22,9 +24,9 @@ func (s *WalletTestSuite) TestSenderBalanceReflectsAfterTwoSameTransactions() {
 	recipient := "recipient"
 	amount := 50
 
-	_, err := s.w.CreateTransaction(recipient, amount, s.tp)
+	_, err := s.w.CreateTransaction(recipient, amount, s.bc, s.tp)
 	s.Nil(err)
-	_, err = s.w.CreateTransaction(recipient, amount, s.tp)
+	_, err = s.w.CreateTransaction(recipient, amount, s.bc, s.tp)
 	s.Nil(err)
 
 	// Transaction output sender balance should accurately reflect the two transactions
@@ -41,9 +43,9 @@ func (s *WalletTestSuite) TestTwoSameRecipientOutputAfterTwoSameTransactions() {
 	recipient := "recipient"
 	amount := 50
 
-	_, err := s.w.CreateTransaction(recipient, amount, s.tp)
+	_, err := s.w.CreateTransaction(recipient, amount, s.bc, s.tp)
 	s.Nil(err)
-	_, err = s.w.CreateTransaction(recipient, amount, s.tp)
+	_, err = s.w.CreateTransaction(recipient, amount, s.bc, s.tp)
 	s.Nil(err)
 
 	// Should have two similar recipient transaction outputs

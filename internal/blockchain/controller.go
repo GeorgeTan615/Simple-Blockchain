@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/blockchain-prac/internal/errors"
-	"github.com/blockchain-prac/internal/wallet"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,7 +25,7 @@ func AddBlockController(c *gin.Context) {
 }
 
 func GetTransactionsController(c *gin.Context) {
-	c.JSON(200, wallet.Tp.Transactions)
+	c.JSON(200, Tp.Transactions)
 }
 
 func CreateTransactionController(c *gin.Context) {
@@ -36,7 +35,7 @@ func CreateTransactionController(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, errors.NewErrorResp("Error parsing request"))
 	}
 
-	transaction, err := wallet.W.CreateTransaction(req.Recipient, req.Amount, wallet.Tp)
+	transaction, err := W.CreateTransaction(req.Recipient, req.Amount, Bc, Tp)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, errors.NewErrorResp("Transaction not created successfully"))
@@ -50,6 +49,6 @@ func GetPublicKeyController(c *gin.Context) {
 	c.JSON(http.StatusOK, struct {
 		PublicKey string `json:"publicKey"`
 	}{
-		PublicKey: wallet.W.PublicKeyStr,
+		PublicKey: W.PublicKeyStr,
 	})
 }

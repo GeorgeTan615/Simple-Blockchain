@@ -3,15 +3,13 @@ package blockchain
 import (
 	"strings"
 	"time"
-
-	"github.com/blockchain-prac/internal/wallet"
 )
 
 type ProofOfWorkReq struct {
 	nonce      int
 	difficulty int
 	lastHash   string
-	data       []*wallet.Transaction
+	data       []*Transaction
 }
 
 type ProofOfWorkResp struct {

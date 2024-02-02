@@ -3,14 +3,14 @@ package blockchain
 import (
 	"log"
 
-	"github.com/blockchain-prac/internal/wallet"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
 type P2PServerMessage struct {
-	Blockchain  *Blockchain
-	Transaction *wallet.Transaction
+	Blockchain           *Blockchain
+	Transaction          *Transaction
+	ClearTransactionPool bool
 }
 
 var upgrader = websocket.Upgrader{
@@ -22,11 +22,11 @@ var P2PServerInstance *P2PServer
 
 type P2PServer struct {
 	Blockchain      *Blockchain
-	TransactionPool *wallet.TransactionPool
+	TransactionPool *TransactionPool
 	Sockets         []*websocket.Conn
 }
 
-func NewP2PServer(blockchain *Blockchain, transactionPool *wallet.TransactionPool, sockets []*websocket.Conn) *P2PServer {
+func NewP2PServer(blockchain *Blockchain, transactionPool *TransactionPool, sockets []*websocket.Conn) *P2PServer {
 	return &P2PServer{
 		Blockchain:      blockchain,
 		TransactionPool: transactionPool,
@@ -74,7 +74,7 @@ func (p2pServer *P2PServer) SyncChains() {
 	}
 }
 
-func (p2pServer *P2PServer) BroadcastTransaction(transaction *wallet.Transaction) {
+func (p2pServer *P2PServer) BroadcastTransaction(transaction *Transaction) {
 	msg := &P2PServerMessage{
 		Transaction: transaction,
 	}
@@ -85,6 +85,20 @@ func (p2pServer *P2PServer) BroadcastTransaction(transaction *wallet.Transaction
 			return
 		}
 		log.Println("Transaction broadcasted")
+	}
+}
+
+func (p2pServer *P2PServer) BroadcastClearTransactions() {
+	msg := &P2PServerMessage{
+		ClearTransactionPool: true,
+	}
+
+	for _, wsConn := range p2pServer.Sockets {
+		if err := wsConn.WriteJSON(msg); err != nil {
+			log.Println("Error broadcasting clear transaction:", wsConn, err)
+			return
+		}
+		log.Println("Clear transaction broadcasted")
 	}
 }
 
@@ -99,19 +113,17 @@ func HandleBlockchainUpdates(conn *websocket.Conn, clientAddress string) {
 		if msg.Blockchain != nil {
 			ok := P2PServerInstance.Blockchain.ReplaceChain(msg.Blockchain.Chain)
 			if ok {
-				for _, wsConn := range P2PServerInstance.Sockets {
-					if err := wsConn.WriteJSON(Bc); err != nil {
-						log.Println("Error sending blockchain:", wsConn, err)
-						return
-					}
-					log.Println("Chains synced")
-				}
+				P2PServerInstance.SyncChains()
 			}
 		}
 
 		if msg.Transaction != nil {
 			P2PServerInstance.TransactionPool.UpsertTransaction(msg.Transaction)
 			log.Println("Transaction broadcast received")
+		}
+
+		if msg.ClearTransactionPool {
+			P2PServerInstance.TransactionPool.Transactions = nil
 		}
 	}
 }

@@ -5,20 +5,19 @@ import (
 	"time"
 
 	"github.com/blockchain-prac/config"
-	"github.com/blockchain-prac/internal/wallet"
 	"github.com/blockchain-prac/utils"
 )
 
 type Block struct {
-	Timestamp  *time.Time            `json:"timestamp"`
-	LastHash   string                `json:"lastHash"`
-	Hash       string                `json:"hash"`
-	Data       []*wallet.Transaction `json:"data"`
-	Nonce      int                   `json:"nonce"`
-	Difficulty int                   `json:"difficulty"`
+	Timestamp  *time.Time     `json:"timestamp"`
+	LastHash   string         `json:"lastHash"`
+	Hash       string         `json:"hash"`
+	Data       []*Transaction `json:"data"`
+	Nonce      int            `json:"nonce"`
+	Difficulty int            `json:"difficulty"`
 }
 
-func NewBlock(timestamp *time.Time, lastHash, hash string, data []*wallet.Transaction, nonce, difficulty int) *Block {
+func NewBlock(timestamp *time.Time, lastHash, hash string, data []*Transaction, nonce, difficulty int) *Block {
 	return &Block{
 		Timestamp:  timestamp,
 		LastHash:   lastHash,
@@ -41,10 +40,10 @@ func (b *Block) String() string {
 
 func NewGenesisBlock() *Block {
 	currTime := time.Date(2023, time.December, 3, 0, 0, 0, 0, time.UTC)
-	return NewBlock(&currTime, "", "f1r57-h45h", []*wallet.Transaction{}, 0, config.DIFFICULTY)
+	return NewBlock(&currTime, "", "f1r57-h45h", []*Transaction{}, 0, config.DIFFICULTY)
 }
 
-func MineBlock(lastBlock *Block, data []*wallet.Transaction) *Block {
+func MineBlock(lastBlock *Block, data []*Transaction) *Block {
 	difficulty := adjustDifficulty(lastBlock, time.Now(), config.MINE_RATE)
 	resp := proofOfWork(&ProofOfWorkReq{
 		nonce:      0,
@@ -56,7 +55,7 @@ func MineBlock(lastBlock *Block, data []*wallet.Transaction) *Block {
 	return NewBlock(&resp.createdAt, lastBlock.Hash, resp.hash, data, resp.nonce, difficulty)
 }
 
-func Hash(timestamp *time.Time, lastHash string, data []*wallet.Transaction, nonce, difficulty int) string {
+func Hash(timestamp *time.Time, lastHash string, data []*Transaction, nonce, difficulty int) string {
 	hashInput := fmt.Sprintf("%s%s%v%d%d", timestamp.Format(time.RFC3339), lastHash, data, nonce, difficulty)
 	return fmt.Sprintf("%x", string(utils.Hash([]byte(hashInput))))
 }

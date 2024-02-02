@@ -5,23 +5,22 @@ import (
 	"testing"
 	"time"
 
-	"github.com/blockchain-prac/internal/wallet"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMineBlock(t *testing.T) {
-	w := wallet.NewWallet()
-	transaction, err := wallet.NewTransaction(w, "recipient", 50)
+	w := NewWallet()
+	transaction, err := NewTransaction(w, "recipient", 50)
 	assert.Nil(t, err)
-	fooBlock := MineBlock(NewGenesisBlock(), []*wallet.Transaction{transaction})
+	fooBlock := MineBlock(NewGenesisBlock(), []*Transaction{transaction})
 	t.Log(fooBlock)
 }
 
 func TestBlockOps(t *testing.T) {
-	w := wallet.NewWallet()
-	transaction, err := wallet.NewTransaction(w, "recipient", 50)
+	w := NewWallet()
+	transaction, err := NewTransaction(w, "recipient", 50)
 	assert.Nil(t, err)
-	data := []*wallet.Transaction{transaction}
+	data := []*Transaction{transaction}
 	lastBlock := NewGenesisBlock()
 	nextBlock := MineBlock(lastBlock, data)
 
@@ -30,28 +29,28 @@ func TestBlockOps(t *testing.T) {
 }
 
 func TestProofOfWork(t *testing.T) {
-	w := wallet.NewWallet()
-	transaction1, _ := wallet.NewTransaction(w, "recipient", 50)
-	transaction2, _ := wallet.NewTransaction(w, "recipient2", 10)
-	transaction3, _ := wallet.NewTransaction(w, "recipient3", 20)
+	w := NewWallet()
+	transaction1, _ := NewTransaction(w, "recipient", 50)
+	transaction2, _ := NewTransaction(w, "recipient2", 10)
+	transaction3, _ := NewTransaction(w, "recipient3", 20)
 	testInput := []struct {
 		difficulty int
-		data       []*wallet.Transaction
+		data       []*Transaction
 		lastHash   string
 	}{
 		{
 			difficulty: 1,
-			data:       []*wallet.Transaction{transaction1},
+			data:       []*Transaction{transaction1},
 			lastHash:   "123",
 		},
 		{
 			difficulty: 3,
-			data:       []*wallet.Transaction{transaction2},
+			data:       []*Transaction{transaction2},
 			lastHash:   "456",
 		},
 		{
 			difficulty: 5,
-			data:       []*wallet.Transaction{transaction3},
+			data:       []*Transaction{transaction3},
 			lastHash:   "abcdef",
 		},
 	}

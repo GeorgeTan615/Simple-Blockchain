@@ -1,4 +1,4 @@
-package wallet
+package blockchain
 
 import (
 	"reflect"
@@ -9,17 +9,20 @@ import (
 
 type TransactionPoolTestSuite struct {
 	suite.Suite
+	bc *Blockchain
 	t  *Transaction
 	tp *TransactionPool
 	w  *Wallet
 }
 
 func (s *TransactionPoolTestSuite) SetupTest() {
+	bc := NewBlockchain()
 	tp := NewTransactionPool()
 	wallet := NewWallet()
 	amount := 100
-	transaction, _ := wallet.CreateTransaction("recipient", amount, tp)
+	transaction, _ := wallet.CreateTransaction("recipient", amount, bc, tp)
 
+	s.bc = bc
 	s.t = transaction
 	s.tp = tp
 	s.w = wallet
@@ -50,7 +53,7 @@ func (s *TransactionPoolTestSuite) TestGetValidTransactionsWithNonCorruptedTrans
 	expectedValidTransactions := s.tp.Transactions
 	for i := 0; i < 6; i++ {
 		newWallet := NewWallet()
-		transaction, err := newWallet.CreateTransaction("recipient2", 100, s.tp)
+		transaction, err := newWallet.CreateTransaction("recipient2", 100, s.bc, s.tp)
 
 		s.Nil(err)
 		if i%2 == 0 {

@@ -3,8 +3,6 @@ package blockchain
 import (
 	"log"
 	"reflect"
-
-	"github.com/blockchain-prac/internal/wallet"
 )
 
 var Bc *Blockchain
@@ -21,7 +19,7 @@ func NewBlockchain() *Blockchain {
 	}
 }
 
-func (bc *Blockchain) AddBlock(data []*wallet.Transaction) *Block {
+func (bc *Blockchain) AddBlock(data []*Transaction) *Block {
 	lastBlock := bc.Chain[len(bc.Chain)-1]
 	newBlock := MineBlock(lastBlock, data)
 	bc.Chain = append(bc.Chain, newBlock)

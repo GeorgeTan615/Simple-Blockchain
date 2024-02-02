@@ -1,4 +1,4 @@
-package wallet
+package blockchain
 
 import (
 	"github.com/blockchain-prac/utils"

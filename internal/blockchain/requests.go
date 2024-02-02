@@ -1,9 +1,7 @@
 package blockchain
 
-import "github.com/blockchain-prac/internal/wallet"
-
 type AddBlockRequest struct {
-	Data []*wallet.Transaction `json:"data"`
+	Data []*Transaction `json:"data"`
 }
 
 type CreateTransactionRequest struct {
