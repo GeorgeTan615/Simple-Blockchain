@@ -1,0 +1,205 @@
+definitions:
+  blockchain.AddBlockRequest:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/blockchain.Transaction'
+        type: array
+    type: object
+  blockchain.Block:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/blockchain.Transaction'
+        type: array
+      difficulty:
+        type: integer
+      hash:
+        type: string
+      lastHash:
+        type: string
+      nonce:
+        type: integer
+      timestamp:
+        type: string
+    type: object
+  blockchain.Blockchain:
+    properties:
+      chain:
+        items:
+          $ref: '#/definitions/blockchain.Block'
+        type: array
+    type: object
+  blockchain.CreateTransactionRequest:
+    properties:
+      amount:
+        type: integer
+      recipient:
+        type: string
+    type: object
+  blockchain.Transaction:
+    properties:
+      id:
+        type: string
+      input:
+        $ref: '#/definitions/blockchain.TransactionInput'
+      outputs:
+        items:
+          $ref: '#/definitions/blockchain.TransactionOutput'
+        type: array
+    type: object
+  blockchain.TransactionInput:
+    properties:
+      address:
+        type: string
+      amount:
+        type: integer
+      signature:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  blockchain.TransactionOutput:
+    properties:
+      address:
+        type: string
+      amount:
+        type: integer
+    type: object
+  blockchain.TransactionPool:
+    properties:
+      transactions:
+        items:
+          $ref: '#/definitions/blockchain.Transaction'
+        type: array
+    type: object
+  errors.ErrorResp:
+    properties:
+      message:
+        type: string
+      timestamp:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /blocks:
+    get:
+      description: Get the blocks in the blockchain.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/blockchain.Blockchain'
+      summary: Get the blocks in the blockchain.
+      tags:
+      - Blocks
+    post:
+      consumes:
+      - application/json
+      deprecated: true
+      description: Adds a new block in the blockchain.
+      parameters:
+      - description: Add Block Request
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/blockchain.AddBlockRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/blockchain.Blockchain'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResp'
+      summary: Adds a new block in the blockchain.
+      tags:
+      - Blocks
+  /mine-transactions:
+    post:
+      consumes:
+      - application/json
+      description: Mine a new block in the blockchain by including the transactions
+        from the transaction pool.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/blockchain.Blockchain'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResp'
+      summary: Mine a new block in the blockchain by including the transactions from
+        the transaction pool.
+      tags:
+      - Transactions
+  /public-key:
+    get:
+      consumes:
+      - application/json
+      description: Gets the public key of the user's wallet.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Gets the public key of the user's wallet.
+      tags:
+      - Wallet
+  /transactions:
+    get:
+      consumes:
+      - application/json
+      description: Gets the transactions in the transaction pool.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/blockchain.TransactionPool'
+      summary: Gets the transactions in the transaction pool.
+      tags:
+      - Transactions
+    post:
+      consumes:
+      - application/json
+      description: Creates a new transaction and submits it to the transaction pool.
+      parameters:
+      - description: Create Transaction Request
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/blockchain.CreateTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/blockchain.TransactionPool'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrorResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrorResp'
+      summary: Creates a new transaction and submits it to the transaction pool.
+      tags:
+      - Transactions
+swagger: "2.0"

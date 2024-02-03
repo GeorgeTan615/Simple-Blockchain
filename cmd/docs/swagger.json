@@ -1,0 +1,314 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/blocks": {
+            "get": {
+                "description": "Get the blocks in the blockchain.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Blocks"
+                ],
+                "summary": "Get the blocks in the blockchain.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/blockchain.Blockchain"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Adds a new block in the blockchain.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Blocks"
+                ],
+                "summary": "Adds a new block in the blockchain.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": "Add Block Request",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/blockchain.AddBlockRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/blockchain.Blockchain"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/mine-transactions": {
+            "post": {
+                "description": "Mine a new block in the blockchain by including the transactions from the transaction pool.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Mine a new block in the blockchain by including the transactions from the transaction pool.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/blockchain.Blockchain"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/public-key": {
+            "get": {
+                "description": "Gets the public key of the user's wallet.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Gets the public key of the user's wallet.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/transactions": {
+            "get": {
+                "description": "Gets the transactions in the transaction pool.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Gets the transactions in the transaction pool.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/blockchain.TransactionPool"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new transaction and submits it to the transaction pool.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Creates a new transaction and submits it to the transaction pool.",
+                "parameters": [
+                    {
+                        "description": "Create Transaction Request",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/blockchain.CreateTransactionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/blockchain.TransactionPool"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ErrorResp"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "blockchain.AddBlockRequest": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/blockchain.Transaction"
+                    }
+                }
+            }
+        },
+        "blockchain.Block": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/blockchain.Transaction"
+                    }
+                },
+                "difficulty": {
+                    "type": "integer"
+                },
+                "hash": {
+                    "type": "string"
+                },
+                "lastHash": {
+                    "type": "string"
+                },
+                "nonce": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "blockchain.Blockchain": {
+            "type": "object",
+            "properties": {
+                "chain": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/blockchain.Block"
+                    }
+                }
+            }
+        },
+        "blockchain.CreateTransactionRequest": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "recipient": {
+                    "type": "string"
+                }
+            }
+        },
+        "blockchain.Transaction": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "input": {
+                    "$ref": "#/definitions/blockchain.TransactionInput"
+                },
+                "outputs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/blockchain.TransactionOutput"
+                    }
+                }
+            }
+        },
+        "blockchain.TransactionInput": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "integer"
+                },
+                "signature": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "blockchain.TransactionOutput": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "blockchain.TransactionPool": {
+            "type": "object",
+            "properties": {
+                "transactions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/blockchain.Transaction"
+                    }
+                }
+            }
+        },
+        "errors.ErrorResp": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
