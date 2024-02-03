@@ -23,7 +23,3 @@ From the root directory, enter command `go clean -testcache && go test ./...` to
 
 ## How to Update Swagger Docs
 From the root directory of the project, run `swag init -d ./cmd/blockchain -o ./cmd/docs --parseDependency`.
-
-// TODO 
-- Improve test cases, esp with transaction data now
-- Refactor empty slices with nil 
