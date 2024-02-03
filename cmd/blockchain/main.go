@@ -11,14 +11,9 @@ import (
 	"github.com/blockchain-prac/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/joho/godotenv"
 )
 
 func init() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file", err)
-	}
 	blockchain.Bc = blockchain.NewBlockchain()
 	blockchain.Tp = blockchain.NewTransactionPool()
 	blockchain.W = blockchain.NewWallet()

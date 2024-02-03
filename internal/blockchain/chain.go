@@ -8,7 +8,7 @@ import (
 var Bc *Blockchain
 
 type Blockchain struct {
-	Chain []*Block
+	Chain []*Block `json:"chain"`
 }
 
 func NewBlockchain() *Blockchain {

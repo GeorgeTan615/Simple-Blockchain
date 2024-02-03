@@ -10,7 +10,10 @@ A blockchain project built to gain understanding on the fundamental workings of 
     - When a new block is successfully added into the blockchain, the miner will be rewarded. The transaction that will send the mining reward to the miner will be included in the new block's data.
 - Instances of the application can be synchronized (blockchain state & transactions in transaction pool) with each other using Websockets. Refer to section below on how to achieve this.
 
-## How to Run Program
+## How to Run Program Conveniently
+After cloning the repo, run `docker-compose up` at the root directory to directly spin up 3 blockchain nodes that are synchronized with each other.
+
+## How to Run Program Manually
 Head to the `/cmd/blockchain` directory and enter the command `go run .`. 
 
 There are also two environment variables, `HTTP_PORT` and `PEERS` that can be specified along with running `go run .`. 
