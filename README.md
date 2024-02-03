@@ -2,10 +2,12 @@
 A blockchain project built to gain understanding on the fundamental workings of blockchain.
 
 ## Features
+- Each instance of blockchain server will have its own wallet of initial balance 500, along with a private and public key.
+    - User could then create transactions specifying the recipient address and the amount.
+    - Transactions created would be signed with the wallet's private key and submitted to the blockchain's transaction pool.
+- A new block can be added to the blockchain when a blockchain server successfully "mines" a new block.
+    - For each transaction in the transaction pool, the blockchain server that is doing the mining work will verify the transaction and for the valid transactions, it will be added into a new block in the blockchain.
 - Instances of the application can be synchronized (blockchain state & transactions in transaction pool) with each other using Websockets. Refer to section below on how to achieve this.
-- Each spawned server has its own wallet, with a private/public key. Transactions can then be created and submitted to the transaction pool.
-- A new block can be added to the blockchain when valid transactions from the transaction pool have been pulled and successfully added into a new block (a.k.a the mining process).
-
 
 ## How to Run Program
 Head to the `/cmd/blockchain` directory and enter the command `go run .`. 
