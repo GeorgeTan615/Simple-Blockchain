@@ -2,11 +2,12 @@
 A blockchain project built to gain understanding on the fundamental workings of blockchain.
 
 ## Features
-- Each instance of blockchain server will have its own wallet of initial balance 500, along with a private and public key.
+- Each instance of blockchain server will have its own wallet of initial balance $500, along with a private and public key.
     - User could then create transactions specifying the recipient address and the amount.
     - Transactions created would be signed with the wallet's private key and submitted to the blockchain's transaction pool.
 - A new block can be added to the blockchain when a blockchain server successfully "mines" a new block.
     - For each transaction in the transaction pool, the blockchain server that is doing the mining work will verify the transaction and for the valid transactions, it will be added into a new block in the blockchain.
+    - When a new block is successfully added into the blockchain, the miner will be rewarded. The transaction that will send the mining reward to the miner will be included in the new block's data.
 - Instances of the application can be synchronized (blockchain state & transactions in transaction pool) with each other using Websockets. Refer to section below on how to achieve this.
 
 ## How to Run Program
