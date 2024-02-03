@@ -22,7 +22,7 @@ func init() {
 	blockchain.Bc = blockchain.NewBlockchain()
 	blockchain.Tp = blockchain.NewTransactionPool()
 	blockchain.W = blockchain.NewWallet()
-	blockchain.P2PServerInstance = blockchain.NewP2PServer(blockchain.Bc, blockchain.Tp, []*websocket.Conn{})
+	blockchain.P2PServerInstance = blockchain.NewP2PServer(blockchain.Bc, blockchain.Tp, nil)
 	miner.M = miner.NewMiner(blockchain.Bc, blockchain.Tp, blockchain.W, blockchain.P2PServerInstance)
 }
 

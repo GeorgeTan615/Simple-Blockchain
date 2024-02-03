@@ -5,34 +5,40 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestMineBlock(t *testing.T) {
-	w := NewWallet()
-	transaction, err := NewTransaction(w, "recipient", 50)
-	assert.Nil(t, err)
-	fooBlock := MineBlock(NewGenesisBlock(), []*Transaction{transaction})
-	t.Log(fooBlock)
+type BlockTestSuite struct {
+	suite.Suite
+	w *Wallet
+	t *Transaction
 }
 
-func TestBlockOps(t *testing.T) {
-	w := NewWallet()
-	transaction, err := NewTransaction(w, "recipient", 50)
-	assert.Nil(t, err)
-	data := []*Transaction{transaction}
+func (s *BlockTestSuite) SetupTest() {
+	wallet := NewWallet()
+	transaction, _ := NewTransaction(wallet, "recipient", 50)
+	s.w = wallet
+	s.t = transaction
+}
+
+func (s *BlockTestSuite) TestMineBlock() {
+	fooBlock := MineBlock(NewGenesisBlock(), []*Transaction{s.t})
+	s.T().Log(fooBlock)
+}
+
+func (s *BlockTestSuite) TestBlockOps() {
+	data := []*Transaction{s.t}
 	lastBlock := NewGenesisBlock()
 	nextBlock := MineBlock(lastBlock, data)
 
-	assert.Equal(t, data, nextBlock.Data)
-	assert.Equal(t, lastBlock.Hash, nextBlock.LastHash)
+	s.Equal(data, nextBlock.Data)
+	s.Equal(lastBlock.Hash, nextBlock.LastHash)
 }
 
-func TestProofOfWork(t *testing.T) {
-	w := NewWallet()
-	transaction1, _ := NewTransaction(w, "recipient", 50)
-	transaction2, _ := NewTransaction(w, "recipient2", 10)
-	transaction3, _ := NewTransaction(w, "recipient3", 20)
+func (s *BlockTestSuite) TestProofOfWork() {
+	transaction1 := s.t
+	transaction2, _ := NewTransaction(s.w, "recipient2", 10)
+	transaction3, _ := NewTransaction(s.w, "recipient3", 20)
 	testInput := []struct {
 		difficulty int
 		data       []*Transaction
@@ -63,11 +69,11 @@ func TestProofOfWork(t *testing.T) {
 			data:       input.data,
 		}
 		resp := proofOfWork(req)
-		assert.Equal(t, strings.Repeat("0", input.difficulty), resp.hash[:input.difficulty])
+		s.Equal(strings.Repeat("0", input.difficulty), resp.hash[:input.difficulty])
 	}
 }
 
-func TestAdjustDifficulty(t *testing.T) {
+func (s *BlockTestSuite) TestAdjustDifficulty() {
 	startTime := time.Date(2024, time.January, 3, 0, 0, 1, 0, time.UTC)
 	testInput := []struct {
 		lastBlock          *Block
@@ -99,6 +105,10 @@ func TestAdjustDifficulty(t *testing.T) {
 	}
 	for _, input := range testInput {
 		finalDifficulty := adjustDifficulty(input.lastBlock, input.currTime, input.mineRate)
-		assert.Equal(t, input.expectedDifficulty, finalDifficulty)
+		s.Equal(input.expectedDifficulty, finalDifficulty)
 	}
+}
+
+func TestBlockTestSuite(t *testing.T) {
+	suite.Run(t, new(BlockTestSuite))
 }

@@ -12,7 +12,7 @@ type TransactionPool struct {
 
 func NewTransactionPool() *TransactionPool {
 	return &TransactionPool{
-		Transactions: []*Transaction{},
+		Transactions: nil,
 	}
 }
 

@@ -42,7 +42,7 @@ func (b *Block) String() string {
 
 func NewGenesisBlock() *Block {
 	currTime := time.Date(2023, time.December, 3, 0, 0, 0, 0, time.UTC)
-	return NewBlock(&currTime, "", "f1r57-h45h", []*Transaction{}, 0, config.DIFFICULTY)
+	return NewBlock(&currTime, "", "f1r57-h45h", nil, 0, config.DIFFICULTY)
 }
 
 func MineBlock(lastBlock *Block, data []*Transaction) *Block {

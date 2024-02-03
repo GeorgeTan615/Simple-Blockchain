@@ -3,110 +3,91 @@ package blockchain
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestNewBlockchainAddBlock(t *testing.T) {
-	bc := NewBlockchain()
-	assert.Equal(t, 1, len(bc.Chain))
-	assert.Equal(t, NewGenesisBlock(), bc.Chain[0])
+type ChainTestSuite struct {
+	suite.Suite
+	bc *Blockchain
+	w  *Wallet
+	t  *Transaction
 }
 
-func TestBlockchainAddBlock(t *testing.T) {
-	bc := NewBlockchain()
-
-	w := NewWallet()
-	transaction, err := NewTransaction(w, "recipient", 50)
-	assert.Nil(t, err)
-	data := []*Transaction{transaction}
-
-	bc.AddBlock(data)
-	assert.Equal(t, data, bc.Chain[len(bc.Chain)-1].Data)
+func (s *ChainTestSuite) SetupTest() {
+	s.bc = NewBlockchain()
+	s.w = NewWallet()
+	s.t, _ = NewTransaction(s.w, "recipient", 50)
 }
 
-func TestBlockchainValidatesValidChain(t *testing.T) {
-	bc := NewBlockchain()
+func (s *ChainTestSuite) TestNewBlockchainAddBlock() {
+	s.Equal(1, len(s.bc.Chain))
+	s.Equal(NewGenesisBlock(), s.bc.Chain[0])
+}
+
+func (s *ChainTestSuite) TestBlockchainAddBlock() {
+	data := []*Transaction{s.t}
+
+	s.bc.AddBlock(data)
+	s.Equal(data, s.bc.Chain[len(s.bc.Chain)-1].Data)
+}
+
+func (s *ChainTestSuite) TestBlockchainValidatesValidChain() {
 	bc2 := NewBlockchain()
-
-	w := NewWallet()
-	transaction, err := NewTransaction(w, "recipient", 50)
-	assert.Nil(t, err)
-	data := []*Transaction{transaction}
+	data := []*Transaction{s.t}
 
 	bc2.AddBlock(data)
-	assert.True(t, bc.IsValidChain(bc2.Chain))
+	s.True(s.bc.IsValidChain(bc2.Chain))
 }
 
-func TestBlockchainInvalidatesCorruptedGenesisBlock(t *testing.T) {
-	bc := NewBlockchain()
+func (s *ChainTestSuite) TestBlockchainInvalidatesCorruptedGenesisBlock() {
 	bc2 := NewBlockchain()
 
-	w := NewWallet()
-	transaction, err := NewTransaction(w, "recipient", 50)
-	assert.Nil(t, err)
-
-	bc2.Chain[0].Data = append(bc2.Chain[0].Data, transaction)
-	assert.False(t, bc.IsValidChain(bc2.Chain))
+	bc2.Chain[0].Data = append(bc2.Chain[0].Data, s.t)
+	s.False(s.bc.IsValidChain(bc2.Chain))
 }
 
-func TestBlockchainInvalidatesCorruptedChain(t *testing.T) {
-	bc := NewBlockchain()
+func (s *ChainTestSuite) TestBlockchainInvalidatesCorruptedChain() {
 	bc2 := NewBlockchain()
-
-	w := NewWallet()
-	transaction, err := NewTransaction(w, "recipient", 50)
-	assert.Nil(t, err)
-	data := []*Transaction{transaction}
+	data := []*Transaction{s.t}
 
 	bc2.AddBlock(data)
 
-	newTransaction, newErr := NewTransaction(w, "recipient", 100)
-	assert.Nil(t, newErr)
+	newTransaction, newErr := NewTransaction(s.w, "recipient", 100)
+	s.Nil(newErr)
 	newData := []*Transaction{newTransaction}
 
 	bc2.Chain[1].Data = newData
-	assert.False(t, bc.IsValidChain(bc2.Chain))
+	s.False(s.bc.IsValidChain(bc2.Chain))
 }
 
-func TestBlockchainReplaceValidChain(t *testing.T) {
-	bc := NewBlockchain()
+func (s *ChainTestSuite) TestBlockchainReplaceValidChain() {
 	bc2 := NewBlockchain()
-
-	w := NewWallet()
-	transaction, err := NewTransaction(w, "recipient", 50)
-	assert.Nil(t, err)
-	data := []*Transaction{transaction}
+	data := []*Transaction{s.t}
 
 	bc2.AddBlock(data)
-	bc.ReplaceChain(bc2.Chain)
-	assert.Equal(t, bc2.Chain, bc.Chain)
+	s.bc.ReplaceChain(bc2.Chain)
+	s.Equal(bc2.Chain, s.bc.Chain)
 }
 
-func TestBlockchainCantReplaceShorterChain(t *testing.T) {
-	bc := NewBlockchain()
+func (s *ChainTestSuite) TestBlockchainCantReplaceShorterChain() {
+	data := []*Transaction{s.t}
 
-	w := NewWallet()
-	transaction, err := NewTransaction(w, "recipient", 50)
-	assert.Nil(t, err)
-	data := []*Transaction{transaction}
-
-	bc.AddBlock(data)
+	s.bc.AddBlock(data)
 	bc2 := NewBlockchain()
-	bc.ReplaceChain(bc2.Chain)
-	assert.NotEqual(t, bc2.Chain, bc.Chain)
+	s.bc.ReplaceChain(bc2.Chain)
+	s.NotEqual(bc2.Chain, s.bc.Chain)
 }
 
-func TestBlockchainCantReplaceInvalidChain(t *testing.T) {
-	bc := NewBlockchain()
+func (s *ChainTestSuite) TestBlockchainCantReplaceInvalidChain() {
 	bc2 := NewBlockchain()
-
-	w := NewWallet()
-	transaction, err := NewTransaction(w, "recipient", 50)
-	assert.Nil(t, err)
-	data := []*Transaction{transaction}
+	data := []*Transaction{s.t}
 
 	bc2.AddBlock(data)
 	bc2.Chain[1].Hash = "123"
-	bc.ReplaceChain(bc2.Chain)
-	assert.NotEqual(t, bc2.Chain, bc.Chain)
+	s.bc.ReplaceChain(bc2.Chain)
+	s.NotEqual(bc2.Chain, s.bc.Chain)
+}
+
+func TestChainTestSuite(t *testing.T) {
+	suite.Run(t, new(ChainTestSuite))
 }
