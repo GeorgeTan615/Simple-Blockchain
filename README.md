@@ -9,6 +9,7 @@ A blockchain project built to gain understanding on the fundamental workings of 
     - For each transaction in the transaction pool, the blockchain server that is doing the mining work will verify the transaction and for the valid transactions, it will be added into a new block in the blockchain.
     - When a new block is successfully added into the blockchain, the miner will be rewarded. The transaction that will send the mining reward to the miner will be included in the new block's data.
 - Instances of the application can be synchronized (blockchain state & transactions in transaction pool) with each other using Websockets. Refer to section below on how to achieve this.
+- CD pipeline to deploy to Google Cloud Run is set up using GitHub actions.
 
 ## How to Run Program Conveniently
 After cloning the repo, run `docker-compose up` at the root directory to directly spin up 3 blockchain server nodes that are synchronized with each other.
