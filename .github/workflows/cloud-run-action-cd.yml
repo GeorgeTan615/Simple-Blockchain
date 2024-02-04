@@ -1,6 +1,9 @@
-name: publish
+name: Deploy to Production
 
-on: [push]
+on:
+  push:
+    branches:
+      - main  # Workflow will trigger only when there's a push to the main branch
 
 jobs:
   build:
@@ -12,7 +15,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: Setup GCP Service Account
-        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@v0
         with:
           version: 'latest'
           service_account_email: ${{ secrets.GCP_SA_EMAIL }}
