@@ -49,7 +49,7 @@ func connectToWsPeers(peers []string) {
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 	r := gin.Default()
-	r.Use(cors.New(cors.DefaultConfig()))
+	r.Use(cors.Default())
 
 	InitRoutes(r)
 
