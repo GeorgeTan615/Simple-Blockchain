@@ -18,11 +18,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Setup GCP Service Account
+      - name: 'Set up Cloud SDK'
         uses: google-github-actions/setup-gcloud@v2
         with:
           version: 'latest'
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Configure Docker
         run: |
