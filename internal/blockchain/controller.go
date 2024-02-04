@@ -23,7 +23,6 @@ func GetBlocksController(c *gin.Context) {
 // @Deprecated
 // @Summary Adds a new block in the blockchain.
 // @Description Adds a new block in the blockchain.
-// @Schemes https
 // @Tags Blocks
 // @Accept json
 // @Produce json
@@ -46,7 +45,6 @@ func AddBlockController(c *gin.Context) {
 
 // @Summary Gets the transactions in the transaction pool.
 // @Description Gets the transactions in the transaction pool.
-// @Schemes https
 // @Tags Transactions
 // @Accept json
 // @Produce json
@@ -60,7 +58,6 @@ func GetTransactionsController(c *gin.Context) {
 
 // @Summary Creates a new transaction and submits it to the transaction pool.
 // @Description Creates a new transaction and submits it to the transaction pool.
-// @Schemes https
 // @Tags Transactions
 // @Accept json
 // @Produce json
@@ -88,7 +85,6 @@ func CreateTransactionController(c *gin.Context) {
 
 // @Summary Gets the public key of the user's wallet.
 // @Description Gets the public key of the user's wallet.
-// @Schemes https
 // @Tags Wallet
 // @Accept json
 // @Produce json

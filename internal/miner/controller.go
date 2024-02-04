@@ -9,7 +9,6 @@ import (
 
 // @Summary Mine a new block in the blockchain by including the transactions from the transaction pool.
 // @Description Mine a new block in the blockchain by including the transactions from the transaction pool.
-// @Schemes https
 // @Tags Transactions
 // @Accept json
 // @Produce json
