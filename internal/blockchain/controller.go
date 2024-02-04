@@ -14,7 +14,9 @@ import (
 // @Success 200 {object} blockchain.Blockchain
 // @Router /blocks [get]
 func GetBlocksController(c *gin.Context) {
-	c.JSON(200, Bc)
+	c.JSON(http.StatusOK, gin.H{
+		"blockchain": Bc,
+	})
 }
 
 // @Deprecated
@@ -48,10 +50,8 @@ func AddBlockController(c *gin.Context) {
 // @Success 200 {object} blockchain.TransactionPool.Transactions
 // @Router /transactions [get]
 func GetTransactionsController(c *gin.Context) {
-	c.JSON(200, struct {
-		Transactions []*Transaction `json:"transactions"`
-	}{
-		Transactions: Tp.Transactions,
+	c.JSON(http.StatusOK, gin.H{
+		"transactions": Tp.Transactions,
 	})
 }
 
@@ -90,9 +90,7 @@ func CreateTransactionController(c *gin.Context) {
 // @Success 200 {string} string
 // @Router /public-key [get]
 func GetPublicKeyController(c *gin.Context) {
-	c.JSON(http.StatusOK, struct {
-		PublicKey string `json:"publicKey"`
-	}{
-		PublicKey: W.PublicKeyStr,
+	c.JSON(http.StatusOK, gin.H{
+		"publicKey": W.PublicKeyStr,
 	})
 }
