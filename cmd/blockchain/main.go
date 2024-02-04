@@ -9,7 +9,6 @@ import (
 	"github.com/blockchain-prac/internal/blockchain"
 	"github.com/blockchain-prac/internal/miner"
 	"github.com/blockchain-prac/utils"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -49,7 +48,7 @@ func connectToWsPeers(peers []string) {
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 	r := gin.Default()
-	r.Use(cors.Default())
+	// r.Use(cors.Default())
 
 	InitRoutes(r)
 
