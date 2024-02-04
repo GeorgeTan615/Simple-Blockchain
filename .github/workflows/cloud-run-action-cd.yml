@@ -12,11 +12,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        
+
       - name: Auth
         uses: 'google-github-actions/auth@v2'
         with:
-          token_format: 'access_token'
+          # token_format: 'access_token'
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_CREDENTIALS }}
 
       - name: 'Set up Cloud SDK'
