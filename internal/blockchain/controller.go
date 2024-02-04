@@ -9,6 +9,7 @@ import (
 
 // @Summary Get the blocks in the blockchain.
 // @Description Get the blocks in the blockchain.
+// @Schemes
 // @Tags Blocks
 // @Produce json
 // @Success 200 {object} blockchain.Blockchain
