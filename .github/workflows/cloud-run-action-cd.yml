@@ -40,8 +40,8 @@ jobs:
           gcloud run deploy simple-blockchain \
           --region asia-east1 \
           --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/simple-blockchain \
+          --cpu 0.1 \
+          --memory 128Mi \
           --platform managed \
           --allow-unauthenticated \
           --project ${{ secrets.GCP_PROJECT_ID }}
-          --cpu 0.1
-          --memory 128Mi
