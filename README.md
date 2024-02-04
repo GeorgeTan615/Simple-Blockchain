@@ -11,7 +11,7 @@ A blockchain project built to gain understanding on the fundamental workings of 
 - Instances of the application can be synchronized (blockchain state & transactions in transaction pool) with each other using Websockets. Refer to section below on how to achieve this.
 
 ## How to Run Program Conveniently
-After cloning the repo, run `docker-compose up` at the root directory to directly spin up 3 blockchain nodes that are synchronized with each other.
+After cloning the repo, run `docker-compose up` at the root directory to directly spin up 3 blockchain server nodes that are synchronized with each other.
 
 ## How to Run Program Manually
 Head to the `/cmd/blockchain` directory and enter the command `go run .`. 
