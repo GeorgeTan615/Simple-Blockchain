@@ -24,8 +24,7 @@ func InitRoutes(r *gin.Engine) {
 	// Swagger
 	docs.SwaggerInfo.Title = "Simple Blockchain"
 	docs.SwaggerInfo.Description = "This is a project built to gain more understanding on the fundamental workings of blockchain."
-	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.BasePath = "/"
-	docs.SwaggerInfo.Schemes = []string{"http"}
+	// docs.SwaggerInfo.Version = "1.0"
+	// docs.SwaggerInfo.BasePath = "/"
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 }
