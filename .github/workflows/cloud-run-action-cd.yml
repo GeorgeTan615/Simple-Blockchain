@@ -3,7 +3,7 @@ name: Deploy to Production
 on:
   push:
     branches:
-      - main  # Workflow will trigger only when there's a push to the main branch
+      - main 
 
 jobs:
   build:
@@ -16,10 +16,9 @@ jobs:
       - name: Auth
         uses: 'google-github-actions/auth@v2'
         with:
-          # token_format: 'access_token'
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_CREDENTIALS }}
 
-      - name: 'Set up Cloud SDK'
+      - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
           version: 'latest'
@@ -30,17 +29,17 @@ jobs:
       
       - name: Build
         run: |
-          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/myapp:latest .
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/simple_blockchain:latest .
 
       - name: Push
         run: |
-          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/myapp:latest
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/simple_blockchain:latest
 
       - name: Deploy
         run: |
-          gcloud run deploy myapp \
+          gcloud run deploy simple_blockchain \
           --region asia-east1 \
-          --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/myapp \
+          --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/simple_blockchain \
           --platform managed \
           --allow-unauthenticated \
           --project ${{ secrets.GCP_PROJECT_ID }}
